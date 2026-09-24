@@ -1,0 +1,11 @@
+name: Build K15 Pro SE ZMK Firmware
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    uses: Keychron/zmk/.github/workflows/build-user-config.yml@rtl8762g
+    with:
+      fallback_binary: bin
+      archive_name: k15_pro_se_firmware

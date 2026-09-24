@@ -1,0 +1,4 @@
+include:
+  - board: keychron
+    shield: keychron_v10_ultra_ansi
+    artifact-name: k15_pro_se_zmk
