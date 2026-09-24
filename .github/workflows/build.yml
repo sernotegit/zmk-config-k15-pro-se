@@ -1,11 +1,40 @@
 name: Build K15 Pro SE ZMK Firmware
+
 on:
   workflow_dispatch:
   push:
 
 jobs:
   build:
-    uses: Keychron/zmk/.github/workflows/build-user-config.yml@rtl8762g
-    with:
-      fallback_binary: bin
-      archive_name: k15_pro_se_firmware
+    runs-on: ubuntu-latest
+    container:
+      image: zmkfirmware/zmk-build-arm:stable
+
+    steps:
+      - name: Checkout config
+        uses: actions/checkout@v4
+
+      - name: Initialize workspace (west init)
+        run: |
+          west init -l config
+          west update
+          west zephyr-export
+
+      - name: West Build
+        run: |
+          cd zmk/app
+          west build -s . -b keychron -- -DSHIELD=keychron_v10_ultra_ansi -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir -p artifacts
+          if [ -f zmk/app/build/zephyr/zmk.bin ]; then
+            cp zmk/app/build/zephyr/zmk.bin artifacts/k15_pro_se_zmk.bin
+          fi
+          ls -la artifacts/
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: k15_pro_se_firmware
+          path: artifacts/
